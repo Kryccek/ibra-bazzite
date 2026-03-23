@@ -46,7 +46,8 @@ jobs:
           tags: |
             latest
             ${{ steps.date.outputs.date }}
-          containerfiles: ./Containerfile
+          containerfiles: ./ibra-bazzite/Containerfile
+          context: ./ibra-bazzite
           oci: true
 
       - name: Push image to ghcr.io
