@@ -1,0 +1,14 @@
+#!/bin/bash
+# Wake-on-LAN – activé automatiquement sur chaque interface Ethernet au démarrage
+# Ce script est exécuté par NetworkManager à chaque connexion réseau
+
+INTERFACE="$1"
+EVENT="$2"
+
+if [ "$EVENT" = "up" ]; then
+    # Vérifie que c'est bien une interface Ethernet (pas wifi)
+    if ethtool "$INTERFACE" 2>/dev/null | grep -q "Supported ports"; then
+        ethtool -s "$INTERFACE" wol g
+        logger "Wake-on-LAN activé sur $INTERFACE"
+    fi
+fi

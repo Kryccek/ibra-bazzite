@@ -1,0 +1,19 @@
+[Unit]
+Description=Ollama – Serveur LLM local
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Ollama écoute uniquement sur localhost par défaut (sécurisé)
+Environment="OLLAMA_HOST=127.0.0.1:11434"
+ExecStart=/usr/local/bin/ollama serve
+Restart=on-failure
+RestartSec=5
+# Crée un utilisateur dédié pour Ollama
+DynamicUser=yes
+StateDirectory=ollama
+RuntimeDirectory=ollama
+
+[Install]
+WantedBy=multi-user.target

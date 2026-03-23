@@ -1,0 +1,16 @@
+[Unit]
+Description=ibra-bazzite – Configuration premier démarrage
+After=network-online.target flatpak-system-helper.service graphical.target
+Wants=network-online.target flatpak-system-helper.service
+# Ne s'exécute qu'une seule fois (fichier sentinel)
+ConditionPathExists=!/var/lib/ibra-bazzite/.firstboot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/ibra-bazzite/firstboot.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

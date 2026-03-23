@@ -1,0 +1,35 @@
+ARG BASE_IMAGE="ghcr.io/ublue-os/bazzite"
+ARG TAG="stable"
+
+FROM ${BASE_IMAGE}:${TAG}
+
+# ─── Labels ───────────────────────────────────────────────────────────────────
+LABEL org.opencontainers.image.title="ibra-bazzite"
+LABEL org.opencontainers.image.description="Bazzite KDE personnalisé – Console de jeu (WoL, Tailscale, Ollama, Moonlight)"
+LABEL org.opencontainers.image.source="https://github.com/TON_GITHUB_USER/ibra-bazzite"
+
+# ─── Copie des fichiers de configuration ──────────────────────────────────────
+COPY config/files /
+
+# ─── Packages système ─────────────────────────────────────────────────────────
+# Tailscale est disponible dans les dépôts Fedora
+# ethtool est nécessaire pour Wake-on-LAN
+RUN rpm-ostree install \
+        tailscale \
+        ethtool \
+    && ostree container commit
+
+# ─── Ollama (LLM local) ───────────────────────────────────────────────────────
+# Téléchargement du binaire Ollama et ajout du service systemd
+RUN curl -fsSL "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64.tgz" \
+        -o /tmp/ollama.tgz \
+    && tar -xzf /tmp/ollama.tgz -C /usr/local/bin/ \
+    && chmod +x /usr/local/bin/ollama \
+    && rm /tmp/ollama.tgz \
+    && ostree container commit
+
+# ─── Activation des services au démarrage ────────────────────────────────────
+RUN systemctl enable tailscaled \
+    && systemctl enable ollama \
+    && systemctl enable ibra-bazzite-firstboot \
+    && ostree container commit
